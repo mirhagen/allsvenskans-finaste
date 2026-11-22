@@ -11,20 +11,17 @@ interface Club {
   founded: number;
   colors: string;
   stadium: string;
+  logo: string;
 }
 
 interface ClubCardProps {
   club: Club;
+  crownPrice: number;
+  crownHolder?: string;
 }
 
-export default function ClubCard({ club }: ClubCardProps) {
+export default function ClubCard({ club, crownPrice, crownHolder }: ClubCardProps) {
   const [showBidModal, setShowBidModal] = useState(false);
-
-  // Random crown data for demo — seeded from club id for consistency
-  const seed = club.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  const crownPrice = 10 + ((seed * 7 + 13) % 50);
-  const holders = ['Mattias M.', 'Anders L.', 'Johan K.', 'Erik S.', 'Per H.', 'Sara B.', 'Lisa N.'];
-  const crownHolder = holders[seed % holders.length];
 
   return (
     <>
@@ -33,7 +30,7 @@ export default function ClubCard({ club }: ClubCardProps) {
         onClick={() => setShowBidModal(true)}
       >
         {/* Crown indicator */}
-        <div className="absolute -top-3 right-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+        <div className="absolute -top-3 right-4 z-20 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
           <Crown className="w-3 h-3" />
           {crownPrice} kr
         </div>
@@ -45,6 +42,17 @@ export default function ClubCard({ club }: ClubCardProps) {
             background: `linear-gradient(90deg, ${club.colors.includes('Gul') ? '#FFD700' : club.colors.includes('Blå') ? '#1E3A8A' : club.colors.includes('Rött') ? '#DC2626' : club.colors.includes('Grönt') ? '#16A34A' : '#FFFFFF'}, ${club.colors.includes('Svart') ? '#000000' : club.colors.includes('Vit') ? '#FFFFFF' : '#6B7280'})`,
           }}
         />
+
+        {/* Club logo */}
+        {club.logo && (
+          <div className="flex justify-center mb-3">
+            <img
+              src={club.logo}
+              alt={club.name}
+              className="w-16 h-16 rounded-full object-contain shadow-lg"
+            />
+          </div>
+        )}
 
         <div className="flex items-start justify-between mb-4 pt-2">
           <div>
@@ -78,7 +86,7 @@ export default function ClubCard({ club }: ClubCardProps) {
           <div className="flex items-center justify-between">
             <div className="text-sm">
               <span className="text-gray-500">Troninnehavare: </span>
-              <span className="text-white font-semibold">{crownHolder}</span>
+              <span className="text-white font-semibold">{crownHolder ?? '—'}</span>
             </div>
           </div>
         </div>
@@ -91,7 +99,14 @@ export default function ClubCard({ club }: ClubCardProps) {
         </div>
       </div>
 
-      {showBidModal && <BidModal club={club} onClose={() => setShowBidModal(false)} />}
+      {showBidModal && (
+        <BidModal
+          club={club}
+          crownPrice={crownPrice}
+          crownHolder={crownHolder}
+          onClose={() => setShowBidModal(false)}
+        />
+      )}
     </>
   );
 }
