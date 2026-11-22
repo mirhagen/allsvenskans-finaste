@@ -1,6 +1,6 @@
 CREATE TABLE "bids" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"club_id" text NOT NULL,
+	"club_id" uuid NOT NULL,
 	"holder_name" text NOT NULL,
 	"price" numeric NOT NULL,
 	"message" text,

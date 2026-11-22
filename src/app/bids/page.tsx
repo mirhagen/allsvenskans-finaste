@@ -5,6 +5,8 @@ import { bids, clubs } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { unstable_noStore } from 'next/cache';
 
+export const dynamic = 'force-dynamic';
+
 const DQ = String.fromCharCode(34);
 
 export default async function Bids() {

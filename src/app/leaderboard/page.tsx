@@ -1,9 +1,10 @@
 import Image from 'next/image';
 import { Crown, Trophy, MapPin, Calendar, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { cache } from 'react';
 import { db } from '@/lib/db';
 import { clubs, bids } from '@/lib/db/schema';
+
+export const dynamic = 'force-dynamic';
 
 interface ClubRanking {
   id: string;
@@ -19,7 +20,7 @@ interface ClubRanking {
   totalRaised: number;
 }
 
-const getClubRankings = cache(async () => {
+async function getClubRankings(): Promise<ClubRanking[]> {
   const clubData = await db
     .select({
       id: clubs.id,
@@ -33,7 +34,7 @@ const getClubRankings = cache(async () => {
       logo: clubs.logo,
     })
     .from(clubs)
-    .orderBy((db) => db.crownPrice);
+    .orderBy(clubs.crownPrice);
 
   const allBids = await db
     .select({
@@ -66,7 +67,7 @@ const getClubRankings = cache(async () => {
       totalRaised: stats.total,
     } as ClubRanking;
   });
-});
+}
 
 export default async function Leaderboard() {
   const rankings = await getClubRankings();

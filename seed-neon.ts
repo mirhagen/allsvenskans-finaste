@@ -1,3 +1,4 @@
+import { Pool } from '@neondatabase/serverless';
 import { db } from '@/lib/db';
 import { clubs } from '@/lib/db/schema';
 import { sql } from 'drizzle-orm';
@@ -23,18 +24,9 @@ const clubsData = [
 
 async function seed() {
   for (const club of clubsData) {
-    await db
-      .insert(clubs)
-      .values({
-        ...club,
-        crownPrice: '10',
-        createdAt: sql`now()`,
-      })
-      .onConflictDoNothing();
+    await db.insert(clubs).values({ ...club, crownPrice: '10', createdAt: sql`now()` }).onConflictDoNothing();
   }
-
   const count = await db.select({ count: sql<number>`count(*)` }).from(clubs);
   console.log(`✅ Seedade ${count[0].count} klubbar`);
 }
-
 seed().catch(console.error);

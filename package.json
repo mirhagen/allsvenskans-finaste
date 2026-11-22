@@ -12,6 +12,8 @@
     "db:seed": "tsx src/lib/db/seed.ts"
   },
   "dependencies": {
+    "@neon/config": "^1.14.6",
+    "@neon/env": "^2.1.9",
     "@neondatabase/serverless": "^1.2.1",
     "drizzle-kit": "^0.31.11",
     "drizzle-orm": "^0.45.4",

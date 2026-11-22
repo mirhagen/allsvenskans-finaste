@@ -6,6 +6,8 @@ import { db } from '@/lib/db';
 import { clubs } from '@/lib/db/schema';
 import { unstable_noStore } from 'next/cache';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   unstable_noStore();
   const data = await db.select().from(clubs).orderBy(clubs.name);
