@@ -22,22 +22,25 @@ export default function BidModal({ club, crownPrice, crownHolder, onClose }: Bid
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async () => {
-    setPaidPrice(crownPrice);
+  const handleCheckout = async () => {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch('/api/bids', {
+      const res = await fetch('/api/bids/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clubId: club.id, holderName: name.trim(), message: message.trim() }),
+        body: JSON.stringify({
+          clubId: club.id,
+          holderName: name.trim(),
+          message: message.trim(),
+        }),
       });
-      if (!res.ok) throw new Error('Kunde inte kröna klubben');
-      setStep('success');
-      router.refresh();
+      if (!res.ok) throw new Error('Kunde inte skapa betalning');
+      const data = await res.json();
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Ett fel inträffade');
-    } finally {
       setSubmitting(false);
     }
   };
@@ -99,9 +102,17 @@ export default function BidModal({ club, crownPrice, crownHolder, onClose }: Bid
                 <span className="text-white font-bold">{crownPrice} kr</span>
               </div>
             </div>
-            <button onClick={handleSubmit} disabled={submitting} className="w-full py-4 bg-white text-black rounded-lg font-bold text-lg hover:bg-gray-100 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
-              {submitting ? 'Kröner...' : `Krön — ${crownPrice} kr`}
+            <button onClick={handleCheckout} disabled={submitting} className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-bold text-lg hover:from-blue-500 hover:to-blue-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+              {submitting ? 'Dirigerar...' : (
+                <>
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+                  </svg>
+                  Betala — {crownPrice} kr
+                </>
+              )}
             </button>
+            <p className="text-center text-xs text-gray-500">Säker betalning via Stripe</p>
             <button onClick={() => setStep('form')} className="w-full py-2 text-gray-500 text-sm hover:text-white transition-colors">← Tillbaka</button>
           </div>
         ) : (
