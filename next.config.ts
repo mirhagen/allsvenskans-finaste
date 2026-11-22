@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
+    // ~/Code har en egen pnpm-workspace/lockfil; lås roten till projektet så att
+    // Turbopack inte bevakar och söker igenom hela ~/Code.
+    root: __dirname,
     rules: {
       "*.css": {
         loaders: ["@tailwindcss/turbopack"],

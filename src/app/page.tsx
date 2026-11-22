@@ -1,69 +1,68 @@
-import Image from "next/image";
+import Image from 'next/image';
+import ClubCard from '@/components/ClubCard';
+import { clubList as clubs } from '@/data/clubs';
+import { Crown } from 'lucide-react';
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <main className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900">
+      {/* Hero */}
+      <section className="relative overflow-hidden py-20 px-4 text-center">
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 49px, gold 49px, gold 50px), repeating-linear-gradient(90deg, transparent, transparent 49px, gold 49px, gold 50px)',
+          }} />
+        </div>
+
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <div className="flex justify-center mb-6">
+            <div className="relative w-24 h-24">
+              <Image
+                src="/crown-icon.svg"
+                alt="Guld-krona"
+                fill
+                className="object-contain"
+              />
+            </div>
+          </div>
+
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-4">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500">
+              ALLSVENSKANS
+            </span>
+            <br />
+            <span className="text-white">FINASTE</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="text-xl md:text-2xl text-gray-400 mb-2 font-light">
+            18 troner. 18 klubbar.
           </p>
+          <p className="text-2xl md:text-3xl text-yellow-400 font-bold mb-12">
+            Vem regerar i din?
+          </p>
+
+          <div className="flex items-center justify-center gap-2 text-gray-500 text-sm mb-16">
+            <Crown className="w-4 h-4" />
+            <span>Allsvenskans supporterlojalitet, rankad</span>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Clubs Grid */}
+      <section className="px-4 pb-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {clubs.map((club) => (
+              <ClubCard key={club.id} club={club} />
+            ))}
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-800 py-8 px-4 text-center text-gray-600 text-sm">
+        <p>En krona i taget. En klubb på toppen.</p>
+      </footer>
+    </main>
   );
 }
