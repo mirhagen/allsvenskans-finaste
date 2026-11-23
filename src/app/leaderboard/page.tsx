@@ -71,110 +71,163 @@ async function getClubRankings(): Promise<ClubRanking[]> {
   });
 }
 
+// Helper to extract primary colors for borders
+function getClubColors(colors: string) {
+  const [c1] = colors.split('/');
+  const colorMap: Record<string, string> = {
+    'Gult': '#FFD700',
+    'Svart': '#1f2937',
+    'Blå': '#1E40AF',
+    'Vit': '#e5e7eb',
+    'Rött': '#DC2626',
+    'Grönt': '#16A34A',
+  };
+  return colorMap[c1?.trim()] || '#4b5563';
+}
+
 export default async function Leaderboard() {
   const rankings = await getClubRankings();
   const totalRaised = rankings.reduce((sum, c) => sum + Number(c.totalRaised || 0), 0);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900">
-      <section className="relative overflow-hidden py-10 px-4 text-center">
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 49px, gold 49px, gold 50px), repeating-linear-gradient(90deg, transparent, transparent 49px, gold 49px, gold 50px)',
-          }} />
-        </div>
+    <main className="min-h-screen bg-grid-subtle">
+      {/* Background gradient orbs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 -left-48 w-96 h-96 bg-amber-600/5 rounded-full blur-3xl" />
+      </div>
 
-        <div className="relative z-10 max-w-4xl mx-auto">
-          <Link href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-white mb-8 transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            Tillbaka till hem
+      {/* Navigation */}
+      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-black/60 border-b border-white/5">
+        <div className="max-w-4xl mx-auto flex items-center justify-between py-4 px-6">
+          <Link href="/" className="flex items-center gap-2 group">
+            <Crown className="w-6 h-6 text-yellow-400 group-hover:rotate-12 transition-transform" />
+            <span className="text-white font-bold text-lg tracking-tight">
+              Allsvenskans <span className="text-yellow-400">Finaste</span>
+            </span>
           </Link>
+          <Link href="/" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 text-sm font-medium">
+            <ArrowLeft className="w-4 h-4" />
+            Tillbaka
+          </Link>
+        </div>
+      </nav>
 
+      {/* Header */}
+      <section className="relative px-6 pt-10 pb-8 text-center">
+        <div className="relative z-10 max-w-3xl mx-auto">
           <div className="flex justify-center mb-6">
-            <div className="relative w-24 h-24">
-              <Image src="/crown-icon.svg" alt="Guld-krona" fill className="object-contain" />
+            <div className="relative">
+              <div className="absolute inset-0 bg-yellow-400/20 rounded-full blur-2xl scale-150" />
+              <div className="relative w-16 h-16 flex items-center justify-center bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full glow-gold">
+                <Crown className="w-8 h-8 text-black" />
+              </div>
             </div>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-4">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500">
-              LEADERBOARD
-            </span>
+            <span className="text-gold-gradient">LEADERBOARD</span>
           </h1>
 
-          <p className="text-xl text-gray-400 mb-2">
-            Totalt lyft: <span className="text-yellow-400 font-bold">{totalRaised.toLocaleString('sv-SE')} kr</span>
-          </p>
-          <p className="text-sm text-gray-600">
-            Ranking efter nuvarande kronpris (högst först)
-          </p>
-        </div>
-      </section>
-
-      <section className="px-4 pb-20">
-        <div className="max-w-4xl mx-auto">
-          {rankings.map((club, index) => (
-            <div
-              key={club.id}
-              className={`flex items-center gap-4 p-4 mb-2 rounded-xl border transition-all ${
-                index === 0
-                  ? 'bg-gradient-to-r from-yellow-900/30 to-yellow-800/10 border-yellow-500/30'
-                  : index === 1
-                  ? 'bg-gradient-to-r from-gray-700/30 to-gray-800/10 border-gray-400/20'
-                  : index === 2
-                  ? 'bg-gradient-to-r from-orange-900/20 to-orange-800/5 border-orange-700/20'
-                  : 'bg-gray-900/60 border-gray-800'
-              }`}
-            >
-              <div className="flex-shrink-0 w-10 text-center">
-                {index === 0 ? (
-                  <Crown className="w-7 h-7 text-yellow-400 mx-auto" />
-                ) : index === 1 ? (
-                  <Trophy className="w-6 h-6 text-gray-300 mx-auto" />
-                ) : index === 2 ? (
-                  <Trophy className="w-5 h-5 text-orange-400 mx-auto" />
-                ) : (
-                  <span className="text-gray-600 font-bold text-lg">#{index + 1}</span>
-                )}
-              </div>
-
-              <div className="flex-shrink-0 w-10 flex justify-center">
-                {club.logo && (
-                  <img src={club.logo} alt={club.name} className="w-8 h-8 rounded-full" />
-                )}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-bold text-white truncate">{club.name}</h3>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <MapPin className="w-3 h-3" />
-                  <span>{club.city}</span>
-                  <Calendar className="w-3 h-3 ml-2" />
-                  <span>Grundad {club.founded}</span>
-                </div>
-              </div>
-
-              <div className="text-right flex-shrink-0">
-                <div className="text-yellow-400 font-bold text-xl">
-                  {Number(club.crownPrice).toLocaleString('sv-SE')} kr
-                </div>
-                <div className="text-xs text-gray-500">{club.bidCount} bud</div>
-              </div>
-
-              <div className="text-right flex-shrink-0 hidden md:block">
-                <div className="text-gray-400 text-sm">Troninnehavare</div>
-                <div className="text-white font-semibold">
-                  {club.crownHolder || '—'}
-                </div>
-              </div>
+          <div className="grid grid-cols-3 gap-3 max-w-md mx-auto mb-4">
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/5">
+              <div className="text-xl font-black text-white">{rankings.filter(c => c.crownHolder).length}</div>
+              <div className="text-xs text-gray-500 uppercase tracking-wider mt-1">Trona tagna</div>
             </div>
-          ))}
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/5">
+              <div className="text-xl font-black text-yellow-400">{rankings.reduce((s, c) => s + c.bidCount, 0)}</div>
+              <div className="text-xs text-gray-500 uppercase tracking-wider mt-1">Totala bud</div>
+            </div>
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/5">
+              <div className="text-xl font-black text-yellow-400">{totalRaised.toLocaleString('sv-SE')}</div>
+              <div className="text-xs text-gray-500 uppercase tracking-wider mt-1">Totalt kr</div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <footer className="border-t border-gray-800 py-8 px-4 text-center text-gray-600 text-sm">
-        <p>En krona i taget. En klubb på toppen.</p>
-        <p className="mt-1">Totalt samlat: <span className="text-yellow-400">{totalRaised.toLocaleString('sv-SE')} kr</span></p>
+      {/* Rankings */}
+      <section className="relative px-6 pb-24">
+        <div className="max-w-3xl mx-auto">
+          {rankings.map((club, index) => {
+            const isTop3 = index < 3;
+            const borderColor = getClubColors(club.colors);
+            return (
+              <div
+                key={club.id}
+                className={`flex items-center gap-4 p-4 mb-2.5 rounded-xl border transition-all ${
+                  index === 0
+                    ? 'bg-gradient-to-r from-yellow-900/20 to-yellow-800/5 border-yellow-500/30'
+                    : index === 1
+                    ? 'bg-white/[0.03] border-gray-400/20'
+                    : index === 2
+                    ? 'bg-gradient-to-r from-orange-900/15 to-orange-800/5 border-orange-700/20'
+                    : 'glass-card'
+                }`}
+              >
+                {/* Position */}
+                <div className="flex-shrink-0 w-8 text-center">
+                  {index === 0 ? (
+                    <Crown className="w-6 h-6 text-yellow-400 mx-auto" />
+                  ) : index === 1 ? (
+                    <span className="text-gray-300 font-black text-lg">2</span>
+                  ) : index === 2 ? (
+                    <span className="text-orange-400 font-black text-lg">3</span>
+                  ) : (
+                    <span className="text-gray-600 font-bold text-sm">#{index + 1}</span>
+                  )}
+                </div>
+
+                {/* Club logo */}
+                <div className="flex-shrink-0">
+                  {club.logo ? (
+                    <img src={club.logo} alt={club.name} className="w-10 h-10 rounded-full" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10" />
+                  )}
+                </div>
+
+                {/* Club info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-bold text-white truncate">{club.name}</h3>
+                    {isTop3 && (
+                      <div className="h-1 w-5 rounded-full" style={{ backgroundColor: borderColor, opacity: 0.6 }} />
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mt-0.5">
+                    <MapPin className="w-3 h-3 shrink-0" />
+                    <span>{club.city}</span>
+                    <Calendar className="w-3 h-3 ml-2 shrink-0" />
+                    <span>{club.founded}</span>
+                  </div>
+                </div>
+
+                {/* Price */}
+                <div className="text-right flex-shrink-0">
+                  <div className="text-yellow-400 font-bold text-lg tabular-nums">
+                    {Number(club.crownPrice).toLocaleString('sv-SE')} kr
+                  </div>
+                  <div className="text-xs text-gray-500">{club.bidCount} bud</div>
+                </div>
+
+                {/* Crown holder */}
+                <div className="text-right flex-shrink-0 hidden lg:block ml-4">
+                  <div className="text-xs text-gray-500">Regent</div>
+                  <div className={`font-semibold text-sm ${club.crownHolder ? 'text-yellow-400' : 'text-gray-500'}`}>
+                    {club.crownHolder || '—'}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-white/5 py-8 px-6 text-center">
+        <p className="text-gray-600 text-sm">En krona i taget. En klubb på toppen.</p>
+        <p className="text-gray-700 text-xs mt-1">Totalt samlat: <span className="text-yellow-500/60">{totalRaised.toLocaleString('sv-SE')} kr</span></p>
       </footer>
     </main>
   );

@@ -1,8 +1,9 @@
 'use client';
 
-import { Crown, MapPin, Calendar, Trophy } from 'lucide-react';
-import { useState } from 'react';
+import { Crown, MapPin, Calendar, Trophy, Flame } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import BidModal from './BidModal';
+import { motion } from 'framer-motion';
 
 interface Club {
   id: string;
@@ -18,86 +19,130 @@ interface ClubCardProps {
   club: Club;
   crownPrice: number;
   crownHolder?: string;
+  index?: number;
 }
 
-export default function ClubCard({ club, crownPrice, crownHolder }: ClubCardProps) {
+// Helper to extract primary/secondary colors
+function getClubColors(colors: string) {
+  const [c1, c2] = colors.split('/');
+  const colorMap: Record<string, string> = {
+    'Gult': '#FFD700',
+    'Svart': '#000000',
+    'Blå': '#1E40AF',
+    'Vit': '#FFFFFF',
+    'Rött': '#DC2626',
+    'Grönt': '#16A34A',
+  };
+  return {
+    primary: colorMap[c1?.trim()] || '#6B7280',
+    secondary: colorMap[c2?.trim()] || '#9CA3AF',
+  };
+}
+
+// Get a subtle gradient background for logo based on club colors
+function getLogoBg(colors: string) {
+  const { primary, secondary } = getClubColors(colors);
+  return `radial-gradient(circle, ${primary}22 0%, ${secondary}11 100%)`;
+}
+
+export default function ClubCard({ club, crownPrice, crownHolder, index = 0 }: ClubCardProps) {
   const [showBidModal, setShowBidModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const colors = getClubColors(club.colors);
+  const isCrowned = !!crownHolder;
+  const priceGlow = crownPrice > 10 ? 'glow-gold-sm' : '';
 
   return (
     <>
-      <div
-        className="relative group bg-gray-900/80 border border-gray-800 rounded-xl p-6 hover:border-yellow-500/50 transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-lg hover:shadow-yellow-500/5"
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={mounted ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: index * 0.05, duration: 0.4 }}
+        className="relative group glass-card rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:-translate-y-1"
         onClick={() => setShowBidModal(true)}
       >
-        {/* Crown indicator */}
-        <div className="absolute -top-3 right-4 z-20 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
-          <Crown className="w-3 h-3" />
-          {crownPrice} kr
-        </div>
+        {/* Club colors top bar */}
+        <div className="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl" style={{
+          background: `linear-gradient(90deg, ${colors.primary}, ${colors.secondary})`,
+        }} />
 
-        {/* Club colors stripe */}
-        <div
-          className="absolute top-0 left-0 right-0 h-1 rounded-t-xl"
-          style={{
-            background: `linear-gradient(90deg, ${club.colors.includes('Gul') ? '#FFD700' : club.colors.includes('Blå') ? '#1E3A8A' : club.colors.includes('Rött') ? '#DC2626' : club.colors.includes('Grönt') ? '#16A34A' : '#FFFFFF'}, ${club.colors.includes('Svart') ? '#000000' : club.colors.includes('Vit') ? '#FFFFFF' : '#6B7280'})`,
-          }}
-        />
-
-        {/* Club logo */}
-        {club.logo && (
-          <div className="flex justify-center mb-3">
-            <img
-              src={club.logo}
-              alt={club.name}
-              className="w-16 h-16 rounded-full object-contain shadow-lg"
-            />
-          </div>
-        )}
-
-        <div className="flex items-start justify-between mb-4 pt-2">
-          <div>
-            <h3 className="text-2xl font-black text-white tracking-tight">{club.name}</h3>
-            <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
-              <MapPin className="w-3 h-3" />
-              {club.city}
-            </div>
-          </div>
-          <div className="text-right">
-            <Trophy className="w-8 h-8 text-yellow-500/30" />
+        {/* Crown price badge */}
+        <div className="absolute -top-3 right-4 z-20">
+          <div className={`flex items-center gap-1.5 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-xs font-bold px-3 py-1.5 rounded-full ${priceGlow} transition-shadow`}>
+            {isCrowned && <Flame className="w-3 h-3" />}
+            <Crown className="w-3 h-3" />
+            <span>{crownPrice} kr</span>
           </div>
         </div>
 
-        <div className="space-y-2 text-sm text-gray-500">
+        {/* Club logo with colored bg circle */}
+        <div className="flex justify-center mb-4 pt-2">
+          <div 
+            className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-transform group-hover:scale-110"
+            style={{ background: getLogoBg(club.colors) }}
+          >
+            {club.logo ? (
+              <img
+                src={club.logo}
+                alt={club.name}
+                className="w-14 h-14 object-contain rounded-full"
+              />
+            ) : (
+              <Trophy className="w-8 h-8 text-gray-600" />
+            )}
+          </div>
+        </div>
+
+        {/* Club name & city */}
+        <div className="mb-4">
+          <h3 className="text-xl font-black text-white tracking-tight">{club.name}</h3>
+          <div className="flex items-center gap-1 text-gray-500 text-sm mt-0.5">
+            <MapPin className="w-3 h-3" />
+            {club.city}
+          </div>
+        </div>
+
+        {/* Club details */}
+        <div className="space-y-1.5 text-sm text-gray-500 mb-4">
           <div className="flex items-center gap-2">
-            <Calendar className="w-3 h-3" />
+            <Calendar className="w-3 h-3 shrink-0" />
             <span>Grundad {club.founded}</span>
           </div>
           <div>
-            <span className="text-gray-400">Färg: </span>
-            <span>{club.colors}</span>
+            <span className="text-gray-500">Färg: </span>
+            <span className="text-gray-300">{club.colors}</span>
           </div>
           <div>
-            <span className="text-gray-400">Arena: </span>
-            <span>{club.stadium}</span>
+            <span className="text-gray-500">Arena: </span>
+            <span className="text-gray-300">{club.stadium}</span>
           </div>
         </div>
 
-        <div className="mt-4 pt-4 border-t border-gray-800">
+        {/* Crown holder info */}
+        <div className="pt-4 border-t border-white/5">
           <div className="flex items-center justify-between">
             <div className="text-sm">
-              <span className="text-gray-500">Troninnehavare: </span>
-              <span className="text-white font-semibold">{crownHolder ?? '—'}</span>
+              <span className="text-gray-500">Regerar: </span>
+              <span className={`font-semibold ${isCrowned ? 'text-yellow-400' : 'text-gray-400'}`}>
+                {crownHolder ?? '—'}
+              </span>
             </div>
+            {isCrowned && <Crown className="w-4 h-4 text-yellow-500/50" />}
           </div>
         </div>
 
-        {/* Hover CTA */}
-        <div className="absolute inset-0 bg-black/60 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <span className="bg-yellow-500 text-black font-bold text-lg px-6 py-3 rounded-lg">
+        {/* Hover CTA overlay */}
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+          <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black font-bold text-lg px-8 py-3 rounded-xl shadow-lg hover:shadow-yellow-500/25 transition-shadow transform hover:scale-105">
             Krön {club.name}
           </span>
         </div>
-      </div>
+      </motion.div>
 
       {showBidModal && (
         <BidModal
