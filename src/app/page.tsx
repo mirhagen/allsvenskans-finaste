@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import ClubCard from '@/components/ClubCard';
-import { Crown, Swords, Trophy, MapPin, Calendar } from 'lucide-react';
+import { Crown, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { db } from '@/lib/db';
 import { clubs } from '@/lib/db/schema';
@@ -15,87 +15,97 @@ export default async function Home() {
   const crownedCount = data.filter(c => c.crownHolder).length;
 
   return (
-    <main className="min-h-screen bg-grid-subtle">
-      {/* Background gradient orbs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 -left-48 w-96 h-96 bg-amber-600/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 right-1/3 w-96 h-96 bg-yellow-600/5 rounded-full blur-3xl" />
+    <main className="min-h-screen bg-pattern">
+      {/* Decorative top gradient */}
+      <div className="relative h-72 sm:h-80 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50" />
+        <div className="absolute inset-0 opacity-50">
+          <div className="absolute top-10 left-10 w-40 h-40 bg-yellow-200/40 rounded-full blur-3xl" />
+          <div className="absolute bottom-5 right-20 w-56 h-56 bg-amber-200/30 rounded-full blur-3xl" />
+          <div className="absolute top-20 right-10 w-32 h-32 bg-orange-200/30 rounded-full blur-3xl" />
+        </div>
+        {/* Crown shape at top */}
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 opacity-[0.04]">
+          <Crown className="w-96 h-96 text-yellow-600" />
+        </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-black/60 border-b border-white/5">
-        <div className="max-w-6xl mx-auto flex items-center justify-between py-4 px-6">
-          <Link href="/" className="flex items-center gap-2 group">
-            <Crown className="w-6 h-6 text-yellow-400 group-hover:rotate-12 transition-transform" />
-            <span className="text-white font-bold text-lg tracking-tight">
-              Allsvenskans <span className="text-yellow-400">Finaste</span>
-            </span>
-          </Link>
-          <div className="flex items-center gap-6">
-            <Link href="/leaderboard" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-1.5 text-sm font-medium">
-              <Trophy className="w-4 h-4" />
-              Leaderboard
+      {/* Navigation - floating bar */}
+      <nav className="relative -mt-8 z-10 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 flex items-center justify-between px-6 py-3">
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg flex items-center justify-center shadow-sm">
+                <Crown className="w-4 h-4 text-black" />
+              </div>
+              <span className="font-black text-base tracking-tight">
+                Allsvenskans <span className="text-amber-600">Finaste</span>
+              </span>
             </Link>
-            <Link href="/bids" className="text-gray-400 hover:text-yellow-400 transition-colors text-sm font-medium">
-              Budlogg
-            </Link>
+            <div className="flex items-center gap-6 text-sm">
+              <Link href="/leaderboard" className="text-gray-500 hover:text-amber-600 transition-colors flex items-center gap-1.5 font-medium">
+                <Trophy className="w-4 h-4" />
+                Leaderboard
+              </Link>
+              <Link href="/bids" className="text-gray-500 hover:text-amber-600 transition-colors font-medium">
+                Budlogg
+              </Link>
+            </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative px-6 pt-16 pb-12 text-center">
-        <div className="relative z-10 max-w-3xl mx-auto">
+      {/* Hero */}
+      <section className="px-4 pt-12 pb-8 text-center">
+        <div className="max-w-3xl mx-auto">
           {/* Crown icon */}
-          <div className="flex justify-center mb-8 animate-fade-in-up">
-            <div className="relative">
-              <div className="absolute inset-0 bg-yellow-400/20 rounded-full blur-2xl scale-150" />
-              <div className="relative w-20 h-20 flex items-center justify-center bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full glow-gold crown-pulse">
+          <div className="flex justify-center mb-6 animate-fade-in-up">
+            <div className="relative w-20 h-20">
+              <div className="absolute inset-0 bg-yellow-400/10 rounded-full blur-xl scale-125 crown-pulse" />
+              <div className="relative w-20 h-20 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-2xl flex items-center justify-center shadow-lg rotate-3 hover:rotate-6 transition-transform">
                 <Crown className="w-10 h-10 text-black" />
               </div>
             </div>
           </div>
 
           {/* Title */}
-          <h1 className="text-7xl md:text-9xl font-black tracking-tighter mb-4 animate-fade-in-up-delay-1">
+          <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-3 animate-fade-in-up-delay-1">
             <span className="text-gold-gradient">ALLSVENSKANS</span>
             <br />
-            <span className="text-white/90">FINASTE</span>
+            <span className="text-[#1a1a1a]">FINASTE</span>
           </h1>
 
           {/* Tagline */}
-          <p className="text-xl md:text-2xl text-gray-400 mb-8 font-light animate-fade-in-up-delay-2">
-            {data.length} troner. {data.length} klubbar. Vem regerar din?
+          <p className="text-xl text-gray-500 mb-8 font-light animate-fade-in-up-delay-2">
+            {data.length} troner. {data.length} klubbar. <span className="text-amber-600 font-medium">Vem regerar din?</span>
           </p>
 
           {/* Stats row */}
-          <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto mb-10">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/5">
-              <div className="text-2xl md:text-3xl font-black text-white">{data.length}</div>
-              <div className="text-xs text-gray-500 uppercase tracking-wider mt-1">Klubbar</div>
+          <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto mb-10">
+            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+              <div className="text-2xl font-black text-[#1a1a1a]">{data.length}</div>
+              <div className="text-xs text-gray-400 font-medium uppercase tracking-wider mt-1">Klubbar</div>
             </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/5">
-              <div className="text-2xl md:text-3xl font-black text-yellow-400">{crownedCount}</div>
-              <div className="text-xs text-gray-500 uppercase tracking-wider mt-1">Trona tagna</div>
+            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+              <div className="text-2xl font-black text-amber-500">{crownedCount}</div>
+              <div className="text-xs text-gray-400 font-medium uppercase tracking-wider mt-1">Trona tagna</div>
             </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/5">
-              <div className="text-2xl md:text-3xl font-black text-yellow-400">{totalRaised.toLocaleString('sv-SE')}</div>
-              <div className="text-xs text-gray-500 uppercase tracking-wider mt-1">Totalt kr</div>
+            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+              <div className="text-2xl font-black text-amber-500">{totalRaised.toLocaleString('sv-SE')}</div>
+              <div className="text-xs text-gray-400 font-medium uppercase tracking-wider mt-1">Totalt kr</div>
             </div>
           </div>
 
-          {/* CTA */}
-          <div className="flex items-center justify-center gap-3 text-gray-500 text-sm animate-fade-in-up-delay-2">
-            <Swords className="w-4 h-4" />
-            <span>Allsvenskans supporterlojalitet, rankad – betala och krön</span>
-          </div>
+          {/* Subtext */}
+          <p className="text-gray-400 text-sm animate-fade-in-up-delay-2">
+            Betala mer än den som sitter på tronen — så är den din!
+          </p>
         </div>
       </section>
 
       {/* Club Grid */}
-      <section className="relative px-6 pb-24">
-        <div className="max-w-6xl mx-auto">
+      <section className="px-4 pb-20">
+        <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {data.map((club, index) => (
               <ClubCard
@@ -119,15 +129,15 @@ export default async function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-10 px-6 text-center">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <Crown className="w-5 h-5 text-yellow-500/50" />
-            <span className="text-gray-400 font-semibold">Allsvenskans Finaste</span>
+      <footer className="border-t border-gray-200/60 py-8 px-6 text-center">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="w-5 h-5 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md flex items-center justify-center">
+              <Crown className="w-3 h-3 text-black" />
+            </div>
+            <span className="text-gray-400 font-semibold text-sm">Allsvenskans Finaste</span>
           </div>
-          <p className="text-gray-600 text-sm">
-            {data.length} troner. {data.length} klubbar. En krona i taget.
-          </p>
+          <p className="text-gray-400 text-sm">{data.length} troner. {data.length} klubbar. En krona i taget.</p>
         </div>
       </footer>
     </main>
