@@ -53,106 +53,108 @@ export default function ClubCard({ club, crownPrice, crownHolder, index = 0 }: C
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={mounted ? { opacity: 1, y: 0 } : {}}
-        transition={{ delay: index * 0.04, duration: 0.4 }}
-        className="relative group warm-card rounded-2xl cursor-pointer overflow-hidden"
-        onClick={() => setShowBidModal(true)}
-      >
-        {/* Club colors top bar */}
-        <div className="h-1.5" style={{
-          background: `linear-gradient(90deg, ${colors.primary}, ${colors.secondary})`,
-        }} />
-
-        {/* Crown price badge */}
-        <div className="absolute -top-3 right-4 z-20">
-          <div className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm ${
-            isCrowned
-              ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-black'
-              : 'bg-white border border-gray-200 text-gray-600'
-          }`}>
-            {isCrowned && <span className="text-sm">👑</span>}
-            {crownPrice} kr
-          </div>
-        </div>
-
-        <div className="p-5">
-          {/* Club logo */}
-          <div className="flex justify-center mb-4">
-            <div 
-              className="w-20 h-20 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105"
-              style={{ 
-                background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}10)`,
-              }}
-            >
-              {club.logo ? (
-                <img
-                  src={club.logo}
-                  alt={club.name}
-                  className="w-14 h-14 object-contain"
-                />
-              ) : (
-                <Trophy className="w-8 h-8 text-gray-300" />
-              )}
+      <div className="relative">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={mounted ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: index * 0.04, duration: 0.4 }}
+          className="relative group warm-card rounded-2xl cursor-pointer"
+          onClick={() => setShowBidModal(true)}
+        >
+          {/* Crown price badge */}
+          <div className="absolute -top-3 right-4 z-20">
+            <div className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm ${
+              isCrowned
+                ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-black'
+                : 'bg-white border border-gray-200 text-gray-600'
+            }`}>
+              {isCrowned && <span className="text-sm">👑</span>}
+              {crownPrice} kr
             </div>
           </div>
 
-          {/* Club name & city */}
-          <div className="mb-3">
-            <h3 className="text-lg font-bold text-[#1a1a1a] leading-tight">{club.name}</h3>
-            <div className="flex items-center gap-1 text-gray-400 text-sm mt-0.5">
-              <MapPin className="w-3 h-3" />
-              {club.city}
-            </div>
-          </div>
+          {/* Club colors top bar */}
+          <div className="h-1.5 rounded-t-2xl overflow-hidden" style={{
+            background: `linear-gradient(90deg, ${colors.primary}, ${colors.secondary})`,
+          }} />
 
-          {/* Club details */}
-          <div className="space-y-1 text-sm text-gray-400 mb-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-3 h-3 shrink-0" />
-              <span>Grundad {club.founded}</span>
-            </div>
-            <div>
-              <span>Färg: </span>
-              <span className="text-gray-600">{club.colors}</span>
-            </div>
-            <div>
-              <span>Arena: </span>
-              <span className="text-gray-600">{club.stadium}</span>
-            </div>
-          </div>
-
-          {/* Crown holder info */}
-          <div className="pt-3 border-t border-gray-100">
-            <div className="flex items-center justify-between">
-              <div className="text-sm">
-                <span className="text-gray-400">Regerar: </span>
-                <span className={`font-semibold ${isCrowned ? 'text-amber-600' : 'text-gray-300'}`}>
-                  {crownHolder ?? '—'}
-                </span>
+          <div className="p-5">
+            {/* Club logo */}
+            <div className="flex justify-center mb-4">
+              <div 
+                className="w-20 h-20 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105"
+                style={{ 
+                  background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}10)`,
+                }}
+              >
+                {club.logo ? (
+                  <img
+                    src={club.logo}
+                    alt={club.name}
+                    className="w-14 h-14 object-contain"
+                  />
+                ) : (
+                  <Trophy className="w-8 h-8 text-gray-300" />
+                )}
               </div>
-              {isCrowned && <Crown className="w-4 h-4 text-amber-400" />}
+            </div>
+
+            {/* Club name & city */}
+            <div className="mb-3">
+              <h3 className="text-lg font-bold text-[#1a1a1a] leading-tight">{club.name}</h3>
+              <div className="flex items-center gap-1 text-gray-400 text-sm mt-0.5">
+                <MapPin className="w-3 h-3" />
+                {club.city}
+              </div>
+            </div>
+
+            {/* Club details */}
+            <div className="space-y-1 text-sm text-gray-400 mb-4">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-3 h-3 shrink-0" />
+                <span>Grundad {club.founded}</span>
+              </div>
+              <div>
+                <span>Färg: </span>
+                <span className="text-gray-600">{club.colors}</span>
+              </div>
+              <div>
+                <span>Arena: </span>
+                <span className="text-gray-600">{club.stadium}</span>
+              </div>
+            </div>
+
+            {/* Crown holder info */}
+            <div className="pt-3 border-t border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="text-sm">
+                  <span className="text-gray-400">Regerar: </span>
+                  <span className={`font-semibold ${isCrowned ? 'text-amber-600' : 'text-gray-300'}`}>
+                    {crownHolder ?? '—'}
+                  </span>
+                </div>
+                {isCrowned && <Crown className="w-4 h-4 text-amber-400" />}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Hover CTA overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end justify-center pb-6 opacity-0 group-hover:opacity-100 transition-all duration-300">
-          <span className="bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-bold text-sm px-6 py-2.5 rounded-xl shadow-lg hover:scale-105 transition-transform">
-            Krön {club.name} →
-          </span>
-        </div>
-      </motion.div>
+          {/* Hover CTA overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end justify-center pb-6 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            <span className="bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-bold text-sm px-6 py-2.5 rounded-xl shadow-lg hover:scale-105 transition-transform">
+              Krön {club.name} →
+            </span>
+          </div>
+        </motion.div>
 
-      {showBidModal && (
-        <BidModal
-          club={club}
-          crownPrice={crownPrice}
-          crownHolder={crownHolder}
-          onClose={() => setShowBidModal(false)}
-        />
-      )}
+        {showBidModal && (
+          <BidModal
+            club={club}
+            crownPrice={crownPrice}
+            crownHolder={crownHolder}
+            onClose={() => setShowBidModal(false)}
+          />
+        )}
+      </div>
     </>
   );
 }
