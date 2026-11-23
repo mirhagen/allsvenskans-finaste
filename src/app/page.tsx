@@ -18,61 +18,45 @@ export default async function Home() {
       {/* Navigation - fixed at top */}
       <nav className="sticky top-0 z-50 px-4 py-3">
         <div className="max-w-5xl mx-auto">
-          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 flex items-center justify-between px-6 py-3">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg flex items-center justify-center shadow-sm">
-                <Crown className="w-4 h-4 text-black" />
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg border border-white/50 px-6 py-3">
+            {/* Top row: logo + stats + links */}
+            <div className="flex items-center justify-between mb-3">
+              <Link href="/" className="flex items-center gap-2.5">
+                <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg flex items-center justify-center shadow-sm">
+                  <Crown className="w-4 h-4 text-black" />
+                </div>
+                <span className="font-black text-sm tracking-tight">
+                  Allsvenskans <span className="text-amber-600">Finaste</span>
+                </span>
+              </Link>
+              <div className="flex items-center gap-6 text-sm">
+                <Link href="/leaderboard" className="text-gray-500 hover:text-amber-600 transition-colors flex items-center gap-1.5 font-medium">
+                  <Trophy className="w-4 h-4" />
+                  Leaderboard
+                </Link>
+                <Link href="/bids" className="text-gray-500 hover:text-amber-600 transition-colors font-medium">
+                  Budlogg
+                </Link>
               </div>
-              <span className="font-black text-sm tracking-tight">
-                Allsvenskans <span className="text-amber-600">Finaste</span>
-              </span>
-            </Link>
-            <div className="flex items-center gap-6 text-sm">
-              <Link href="/leaderboard" className="text-gray-500 hover:text-amber-600 transition-colors flex items-center gap-1.5 font-medium">
-                <Trophy className="w-4 h-4" />
-                Leaderboard
-              </Link>
-              <Link href="/bids" className="text-gray-500 hover:text-amber-600 transition-colors font-medium">
-                Budlogg
-              </Link>
+            </div>
+            {/* Stats row */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="text-center">
+                <div className="text-lg font-black text-[#1a1a1a]">{data.length}</div>
+                <div className="text-xs text-gray-400 font-medium uppercase tracking-wider">Klubbar</div>
+              </div>
+              <div className="text-center border-x border-gray-100">
+                <div className="text-lg font-black text-amber-500">{crownedCount}</div>
+                <div className="text-xs text-gray-400 font-medium uppercase tracking-wider">Tronar tagna</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-black text-amber-500">{totalRaised.toLocaleString('sv-SE')}</div>
+                <div className="text-xs text-gray-400 font-medium uppercase tracking-wider">Totalt kr</div>
+              </div>
             </div>
           </div>
         </div>
       </nav>
-
-      {/* Subtle hero strip */}
-      <div className="px-4 pt-4 pb-2">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center py-4">
-            <p className="text-[#1a1a1a] font-black text-3xl md:text-4xl tracking-tight">
-              Allsvenskans <span className="text-amber-600">Finaste</span>
-            </p>
-            <p className="text-gray-400 text-sm mt-1">
-              {data.length} troner. {data.length} klubbar. <span className="text-amber-600 font-medium">Vem regerar din?</span>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats row */}
-      <section className="px-4 py-2">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto">
-            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm text-center">
-              <div className="text-2xl font-black text-[#1a1a1a]">{data.length}</div>
-              <div className="text-xs text-gray-400 font-medium uppercase tracking-wider mt-1">Klubbar</div>
-            </div>
-            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm text-center">
-              <div className="text-2xl font-black text-amber-500">{crownedCount}</div>
-              <div className="text-xs text-gray-400 font-medium uppercase tracking-wider mt-1">Trona tagna</div>
-            </div>
-            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm text-center">
-              <div className="text-2xl font-black text-amber-500">{totalRaised.toLocaleString('sv-SE')}</div>
-              <div className="text-xs text-gray-400 font-medium uppercase tracking-wider mt-1">Totalt kr</div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Club Grid */}
       <section className="px-4 py-6">
