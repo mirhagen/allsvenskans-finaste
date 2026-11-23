@@ -2,7 +2,8 @@ import ClubCard from '@/components/ClubCard';
 import { Crown, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { db } from '@/lib/db';
-import { clubs } from '@/lib/db/schema';
+import { clubs, bids } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 import { unstable_noStore } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
@@ -10,8 +11,9 @@ export const dynamic = 'force-dynamic';
 export default async function Home() {
   unstable_noStore();
   const data = await db.select().from(clubs).orderBy(clubs.name);
-  const totalRaised = data.reduce((sum, c) => sum + Number(c.crownPrice || 0), 0);
   const crownedCount = data.filter(c => c.crownHolder).length;
+  const paidBids = await db.select({ price: bids.price }).from(bids).where(eq(bids.status, 'crowned'));
+  const totalRaised = paidBids.reduce((sum, b) => sum + Number(b.price || 0), 0);
 
   return (
     <main className="min-h-screen bg-pattern">
