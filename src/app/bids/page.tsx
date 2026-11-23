@@ -24,6 +24,7 @@ export default async function Bids() {
     })
     .from(bids)
     .innerJoin(clubs, eq(clubs.id, bids.clubId))
+    .where(eq(bids.status, 'crowned'))
     .orderBy(bids.createdAt)
     .execute();
 

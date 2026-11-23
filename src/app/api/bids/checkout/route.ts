@@ -49,8 +49,8 @@ export async function POST(request: Request) {
     ],
     mode: 'payment',
     metadata: sessionData,
-    success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/bid-success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}`,
+    success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/bid-success?session_id={CHECKOUT_SESSION_ID}&status=success`,
+    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}?status=cancelled`,
   });
 
   return NextResponse.json({ url: checkoutSession.url });

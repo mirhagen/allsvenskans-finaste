@@ -3,6 +3,7 @@ import { Crown, Trophy, MapPin, Calendar, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { db } from '@/lib/db';
 import { clubs, bids } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,7 +42,8 @@ async function getClubRankings(): Promise<ClubRanking[]> {
       clubId: bids.clubId,
       price: bids.price,
     })
-    .from(bids);
+    .from(bids)
+    .where(eq(bids.status, 'crowned'));
 
   const statsMap = new Map<string, { count: number; total: number }>();
   for (const bid of allBids) {

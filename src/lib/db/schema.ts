@@ -21,5 +21,9 @@ export const bids = pgTable('bids', {
   holderName: text('holder_name').notNull(),
   price: numeric('price').notNull(),
   message: text('message'),
+  // Stripe Checkout Session som betalade budet – unik så att omskickade webhooks inte dubbelbokar
+  stripeSessionId: text('stripe_session_id').unique(),
+  // 'crowned' = budet tog kronan, 'refunded' = någon hann före, pengarna återbetalade
+  status: text('status').notNull().default('crowned'),
   createdAt: text('created_at').notNull().default(sql`now()`),
 });
