@@ -23,36 +23,22 @@ export async function POST(request: Request) {
 
   const crownPrice = Number(club[0].crownPrice);
 
-  // Skapa unik session ID för att koppla ihop med budet
-  const sessionData = {
-    clubId,
-    holderName,
-    message: message || '',
-    crownPrice: crownPrice.toString(),
-  };
-
-  // Skapa Stripe Checkout-session
-  const checkoutSession = await (stripe.checkout.sessions.create as any)({
-    automatic_tax: { enabled: true },
-    line_items: [
-      {
-        price_data: {
-          currency: 'sek',
-          product_data: {
-            name: `Krön ${club[0].name}`,
-            description: `Buk för ${crownPrice} kr — krönar ${club[0].name} på Allsvenskans Finaste`,
-            tax_code: 'txcd_10000000', // standard product tax code (Stripe Managed Payments)
-          },
-          unit_amount: crownPrice * 100, // Stripe använder ören
-        },
-        quantity: 1,
-      },
-    ],
-    mode: 'payment',
-    metadata: sessionData,
-    success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/bid-success?session_id={CHECKOUT_SESSION_ID}&status=success`,
-    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}?status=cancelled`,
+  // Skapa Payment Intent — ingen automatic_tax → ingen moms
+  const paymentIntent = await (stripe.paymentIntents.create as any)({
+    amount: crownPrice * 100, // Stripe använder ören
+    currency: 'sek',
+    payment_method_types: ['card'],
+    metadata: {
+      clubId,
+      holderName,
+      message: message || '',
+      crownPrice: crownPrice.toString(),
+    },
+    description: `Krön ${club[0].name} — ${crownPrice} kr`,
   });
 
-  return NextResponse.json({ url: checkoutSession.url });
+  return NextResponse.json({
+    clientSecret: paymentIntent.client_secret,
+    amount: crownPrice,
+  });
 }

@@ -1,8 +1,10 @@
 'use client';
 
-import { Crown, X, Check } from 'lucide-react';
-import { useState } from 'react';
+import { Crown, X, Check, Loader2, CreditCard } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { loadStripe } from '@stripe/stripe-js';
+import type { Stripe } from '@stripe/stripe-js';
 
 interface BidModalProps {
   club: { id: string; name: string; city: string; colors: string };
@@ -12,14 +14,27 @@ interface BidModalProps {
 }
 
 export default function BidModal({ club, crownPrice, crownHolder, onClose }: BidModalProps) {
-  const [paidPrice, setPaidPrice] = useState(crownPrice);
+  const [step, setStep] = useState<'form' | 'payment' | 'success'>('form');
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
-  const [step, setStep] = useState<'form' | 'payment' | 'success'>('form');
   const [submitting, setSubmitting] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState('');
+  const [stripe, setStripe] = useState<Stripe | null>(null);
+  const [elementsLoaded, setElementsLoaded] = useState(false);
 
-  const handleCheckout = async () => {
+  useEffect(() => {
+    const initStripe = async () => {
+      const stripeInstance = await loadStripe(
+        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''
+      );
+      setStripe(stripeInstance);
+    };
+    initStripe();
+  }, []);
+
+  const handleCreatePayment = async () => {
     setSubmitting(true);
     setError(null);
     try {
@@ -34,10 +49,54 @@ export default function BidModal({ club, crownPrice, crownHolder, onClose }: Bid
       });
       if (!res.ok) throw new Error('Kunde inte skapa betalning');
       const data = await res.json();
-      window.location.href = data.url;
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Ett fel inträffade');
+      setClientSecret(data.clientSecret);
+      setPaidPrice(data.amount);
+      setStep('payment');
+    } catch {
+      setError('Kunde inte skapa betalning. Försök igen.');
+    } finally {
       setSubmitting(false);
+    }
+  };
+
+  const [paidPrice, setPaidPrice] = useState(crownPrice);
+
+  useEffect(() => {
+    if (clientSecret && stripe && !elementsLoaded) {
+      const elems = stripe.elements({ clientSecret });
+      const card = elems.create('card', {
+        style: {
+          base: {
+            fontSize: '16px',
+            color: '#1a1a1a',
+            '::placeholder': { color: '#9ca3af' },
+          },
+          invalid: { color: '#dc2626' },
+        },
+      });
+      const mountPoint = document.getElementById('card-element');
+      if (mountPoint) {
+        card.mount(mountPoint);
+        setElementsLoaded(true);
+      }
+    }
+  }, [clientSecret, stripe]);
+
+  const handlePay = async () => {
+    if (!stripe || !clientSecret) return;
+    setProcessing(true);
+    setError(null);
+
+    const result = await stripe.confirmCardPayment(clientSecret);
+
+    if (result.error) {
+      setError(result.error.message || 'Betalningen misslyckades');
+      setProcessing(false);
+    } else if (result.paymentIntent?.status === 'succeeded') {
+      setStep('success');
+    } else {
+      setError('Okänt betalningsläge. Vi kontrollerar att det kommit fram.');
+      setProcessing(false);
     }
   };
 
@@ -85,6 +144,78 @@ export default function BidModal({ club, crownPrice, crownHolder, onClose }: Bid
             </div>
           )}
 
+          {/* Success step */}
+          {step === 'success' && (
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
+                  <Check className="w-6 h-6 text-green-600" />
+                </div>
+                <p className="text-green-600 font-bold text-lg">Grattis! 🎉</p>
+                <p className="text-gray-600 mt-2">
+                  <strong className="text-[#1a1a1a]">{name}</strong> krönte {club.name}!
+                </p>
+                <p className="text-amber-600 font-bold text-2xl mt-3">{paidPrice} kr</p>
+                <p className="text-gray-400 text-sm mt-1">Nytt pris: {paidPrice + 10} kr</p>
+              </div>
+              <button onClick={onClose} className="w-full py-3 bg-gray-100 rounded-xl text-gray-700 hover:bg-gray-200 transition-all font-medium">
+                Stäng
+              </button>
+            </div>
+          )}
+
+          {/* Payment step */}
+          {step === 'payment' && (
+            <div className="space-y-4">
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                <p className="text-gray-600 text-sm mb-2">
+                  <strong className="text-[#1a1a1a]">{name}</strong> krönt {club.name} med hälsningen:
+                </p>
+                <p className="text-amber-600 italic text-sm border-l-2 border-amber-300 pl-3">
+                  {message || '—'}
+                </p>
+                <div className="mt-3 pt-3 border-t border-gray-200 flex justify-between">
+                  <span className="text-gray-400 text-sm">Belopp</span>
+                  <span className="text-[#1a1a1a] font-bold text-lg">{paidPrice} kr</span>
+                </div>
+              </div>
+
+              {/* Stripe Card Element */}
+              <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <CreditCard className="w-4 h-4 text-gray-400" />
+                  <span className="text-sm text-gray-500 font-medium">Kortuppgifter</span>
+                </div>
+                <div id="card-element" className="py-2" />
+                <p className="text-xs text-gray-400 mt-2">
+                  Kortnumret, utgångsdatum och CVV. Säkerkrypterad via Stripe.
+                </p>
+              </div>
+
+              <button
+                onClick={handlePay}
+                disabled={processing || !stripe}
+                className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-bold text-lg hover:from-blue-500 hover:to-blue-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 shadow-md"
+              >
+                {processing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Betalar...
+                  </>
+                ) : (
+                  <>
+                    Betala — {paidPrice} kr
+                  </>
+                )}
+              </button>
+
+              <p className="text-center text-xs text-gray-400">Säker betalning via Stripe 🔒</p>
+              <button onClick={onClose} className="w-full py-2 text-gray-400 text-sm hover:text-gray-700 transition-colors">
+                Avbryt
+              </button>
+            </div>
+          )}
+
           {/* Form step */}
           {step === 'form' && (
             <div className="space-y-4">
@@ -128,75 +259,22 @@ export default function BidModal({ club, crownPrice, crownHolder, onClose }: Bid
               </div>
 
               <button
-                onClick={() => name.trim() && setStep('payment')}
-                disabled={!name.trim()}
+                onClick={handleCreatePayment}
+                disabled={!name.trim() || submitting}
                 className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
-                  name.trim()
+                  name.trim() && !submitting
                     ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-black hover:from-yellow-300 hover:to-amber-400 hover:shadow-lg active:scale-[0.98]'
                     : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                 }`}
               >
-                {crownPrice} kr — Krön {club.name}
-              </button>
-            </div>
-          )}
-
-          {/* Payment step */}
-          {step === 'payment' && (
-            <div className="space-y-4">
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                <p className="text-gray-600 text-sm mb-2">
-                  <strong className="text-[#1a1a1a]">{name}</strong> krönt {club.name} med hälsningen:
-                </p>
-                <p className="text-amber-600 italic text-sm border-l-2 border-amber-300 pl-3">
-                  {message || '—'}
-                </p>
-                <div className="mt-3 pt-3 border-t border-gray-200 flex justify-between">
-                  <span className="text-gray-400 text-sm">Belopp</span>
-                  <span className="text-[#1a1a1a] font-bold text-lg">{crownPrice} kr</span>
-                </div>
-              </div>
-
-              <button
-                onClick={handleCheckout}
-                disabled={submitting}
-                className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-bold text-lg hover:from-blue-500 hover:to-blue-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 shadow-md"
-              >
                 {submitting ? (
-                  'Dirigerar till Stripe...'
-                ) : (
                   <>
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
-                    </svg>
-                    Betala — {crownPrice} kr
+                    <Loader2 className="w-5 h-5 animate-spin inline mr-2" />
+                    Skapar betalning...
                   </>
+                ) : (
+                  `${crownPrice} kr — Krön ${club.name}`
                 )}
-              </button>
-
-              <p className="text-center text-xs text-gray-400">Säker betalning via Stripe 🔒</p>
-              <button onClick={() => setStep('form')} className="w-full py-2 text-gray-400 text-sm hover:text-gray-700 transition-colors">
-                ← Tillbaka
-              </button>
-            </div>
-          )}
-
-          {/* Success step */}
-          {step === 'success' && (
-            <div className="space-y-4">
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
-                  <Check className="w-6 h-6 text-green-600" />
-                </div>
-                <p className="text-green-600 font-bold text-lg">Grattis! 🎉</p>
-                <p className="text-gray-600 mt-2">
-                  <strong className="text-[#1a1a1a]">{name}</strong> krönte {club.name}!
-                </p>
-                <p className="text-amber-600 font-bold text-2xl mt-3">{paidPrice} kr</p>
-                <p className="text-gray-400 text-sm mt-1">Nytt pris: {paidPrice + 10} kr</p>
-              </div>
-              <button onClick={onClose} className="w-full py-3 bg-gray-100 rounded-xl text-gray-700 hover:bg-gray-200 transition-all font-medium">
-                Stäng
               </button>
             </div>
           )}

@@ -30,11 +30,12 @@ export async function POST(request: Request) {
   }
 
   if (
+    event.type === 'payment_intent.succeeded' ||
     event.type === 'checkout.session.completed' ||
     event.type === 'checkout.session.async_payment_succeeded'
   ) {
     try {
-      await fulfillCheckout(event.data.object);
+      await fulfillPayment(event.data.object);
     } catch (err) {
       // 500 → Stripe skickar om händelsen; hanteringen är idempotent.
       console.error('Error processing webhook:', err);
@@ -45,18 +46,40 @@ export async function POST(request: Request) {
   return NextResponse.json({ received: true });
 }
 
-async function fulfillCheckout(session: Stripe.Checkout.Session) {
-  // Asynkrona betalmetoder kan vara 'unpaid' vid completed – då kommer async_payment_succeeded senare.
-  if (session.payment_status !== 'paid') return;
+/** Hantera både Payment Intent och Checkout Session */
+async function fulfillPayment(obj: Stripe.PaymentIntent | Stripe.Checkout.Session): Promise<void> {
+  let paymentStatus: string;
+  let amountTotal: number;
+  let metadata: Record<string, string> | undefined;
+  let id: string;
+  let paymentIntentId: string | undefined;
 
-  const { clubId, holderName, message } = session.metadata ?? {};
-  if (!clubId || !holderName || session.amount_total == null) {
-    console.error(`Checkout session ${session.id} saknar metadata eller belopp`);
+  if ('payment_status' in obj) {
+    // Checkout Session
+    paymentStatus = obj.payment_status;
+    amountTotal = obj.amount_total ?? 0;
+    metadata = obj.metadata ?? undefined;
+    id = obj.id;
+    paymentIntentId = typeof obj.payment_intent === 'string' ? obj.payment_intent : obj.payment_intent?.id;
+  } else {
+    // Payment Intent
+    paymentStatus = obj.status === 'succeeded' ? 'paid' : 'unpaid';
+    amountTotal = obj.amount_received;
+    metadata = obj.metadata ?? undefined;
+    id = obj.id;
+    paymentIntentId = obj.id;
+  }
+
+  if (paymentStatus !== 'paid') return;
+
+  const { clubId, holderName, message } = metadata ?? {};
+  if (!clubId || !holderName || amountTotal == null || amountTotal === 0) {
+    console.error(`${id} saknar metadata eller belopp`);
     return;
   }
 
   // Det som faktiskt betalades (öre → kronor), inte vad klienten påstod.
-  const paidPrice = session.amount_total / 100;
+  const paidPrice = amountTotal / 100;
 
   const outcome = await db.transaction(async (tx): Promise<Outcome> => {
     const inserted = await tx
@@ -66,7 +89,7 @@ async function fulfillCheckout(session: Stripe.Checkout.Session) {
         holderName,
         message: message || null,
         price: String(paidPrice),
-        stripeSessionId: session.id,
+        stripeSessionId: id,
         status: 'crowned',
       })
       .onConflictDoNothing({ target: bids.stripeSessionId })
@@ -77,7 +100,7 @@ async function fulfillCheckout(session: Stripe.Checkout.Session) {
       const [existing] = await tx
         .select({ status: bids.status })
         .from(bids)
-        .where(eq(bids.stripeSessionId, session.id));
+        .where(eq(bids.stripeSessionId, id));
       return existing?.status === 'refunded' ? 'refund' : 'duplicate';
     }
 
@@ -96,7 +119,7 @@ async function fulfillCheckout(session: Stripe.Checkout.Session) {
   });
 
   if (outcome === 'refund') {
-    await refund(session);
+    await refund(paymentIntentId);
   } else if (outcome === 'crowned') {
     revalidatePath('/');
     revalidatePath('/leaderboard');
@@ -104,15 +127,13 @@ async function fulfillCheckout(session: Stripe.Checkout.Session) {
   }
 }
 
-async function refund(session: Stripe.Checkout.Session) {
-  const paymentIntent =
-    typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id;
-  if (!paymentIntent) throw new Error(`Session ${session.id} saknar payment_intent`);
+async function refund(paymentIntentId: string | undefined): Promise<void> {
+  if (!paymentIntentId) return;
 
   try {
     await stripe.refunds.create(
-      { payment_intent: paymentIntent, reason: 'duplicate' },
-      { idempotencyKey: `refund-${session.id}` },
+      { payment_intent: paymentIntentId, reason: 'duplicate' },
+      { idempotencyKey: `refund-${paymentIntentId}` },
     );
   } catch (err) {
     if (err instanceof Stripe.errors.StripeInvalidRequestError && err.code === 'charge_already_refunded') {
