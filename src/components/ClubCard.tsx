@@ -42,6 +42,17 @@ const CLUB_COLORS: Record<string, { primary: string; secondary: string }> = {
   'Örgryte IS': { primary: '#FFFFFF', secondary: '#000000' },
 };
 
+// Färgnamn → hex för färgfläckar
+const COLOR_NAME_TO_HEX: Record<string, string> = {
+  'Gult': '#FFD700',
+  'Gul': '#FFC72C',
+  'Svart': '#18181b',
+  'Blå': '#1E40AF',
+  'Vit': '#FFFFFF',
+  'Rött': '#E30613',
+  'Grönt': '#16a34a',
+};
+
 export default function ClubCard({ club, crownPrice, crownHolder, index = 0 }: ClubCardProps) {
   const [showBidModal, setShowBidModal] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -117,8 +128,20 @@ export default function ClubCard({ club, crownPrice, crownHolder, index = 0 }: C
                 <span>Grundad {club.founded}</span>
               </div>
               <div>
-                <span>Färg: </span>
-                <span className="text-gray-600">{club.colors}</span>
+                <span className="text-gray-500">Färg: </span>
+                <div className="inline-flex items-center gap-1.5 ml-2">
+                  {club.colors.split('/').map((c, i) => {
+                    const hex = COLOR_NAME_TO_HEX[c.trim()] || '#9CA3AF';
+                    return (
+                      <div key={i} className="flex items-center gap-1">
+                        <div
+                          className={`w-4 h-4 rounded-full shadow-sm ${hex === '#FFFFFF' ? 'border-2 border-gray-400' : 'border border-gray-200'}`}
+                          style={{ backgroundColor: hex }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
               <div>
                 <span>Arena: </span>
