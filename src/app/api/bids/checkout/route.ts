@@ -41,6 +41,7 @@ export async function POST(request: Request) {
           product_data: {
             name: `Krön ${club[0].name}`,
             description: `Buk för ${crownPrice} kr — krönar ${club[0].name} på Allsvenskans Finaste`,
+            tax_code: 'txcd_10000000', // standard product tax code (Stripe Managed Payments)
           },
           unit_amount: crownPrice * 100, // Stripe använder ören
         },
