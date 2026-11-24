@@ -31,7 +31,7 @@ const CLUB_COLORS: Record<string, { primary: string; secondary: string }> = {
   'GAIS': { primary: '#FFC72C', secondary: '#000000' },
   'Halmstads BK': { primary: '#FFFFFF', secondary: '#000000' },
   'Hammarby IF': { primary: '#003DA5', secondary: '#FFFFFF' },
-  'IF Brommapojkarna': { primary: '#E30613', secondary: '#FFFFFF' },
+  'IF Brommapojkarna': { primary: '#000000', secondary: '#FFFFFF' },
   'IF Elfsborg': { primary: '#FFFFFF', secondary: '#000000' },
   'IFK Göteborg': { primary: '#004CA0', secondary: '#FFFFFF' },
   'IK Sirius': { primary: '#1E40AF', secondary: '#FFFFFF' },
