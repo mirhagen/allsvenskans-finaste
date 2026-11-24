@@ -22,31 +22,32 @@ interface ClubCardProps {
   index?: number;
 }
 
-// Riktiga Allsvenskan-färger (brand-accurate)
+// Riktiga Allsvenskan-färger (brand-accurate, källor: colorcodeguide.com, RSSSF, idrottslaget.se, officiella profilguider)
 const CLUB_COLORS: Record<string, { primary: string; secondary: string }> = {
-  'AIK': { primary: '#FFD700', secondary: '#000000' },
-  'BK Häcken': { primary: '#E30613', secondary: '#FFFFFF' },
-  'Degerfors IF': { primary: '#1E40AF', secondary: '#FFFFFF' },
-  'Djurgårdens IF': { primary: '#004C97', secondary: '#FFFFFF' },
-  'GAIS': { primary: '#FFC72C', secondary: '#000000' },
-  'Halmstads BK': { primary: '#FFFFFF', secondary: '#000000' },
-  'Hammarby IF': { primary: '#003DA5', secondary: '#FFFFFF' },
-  'IF Brommapojkarna': { primary: '#000000', secondary: '#FFFFFF' },
-  'IF Elfsborg': { primary: '#FFFFFF', secondary: '#000000' },
-  'IFK Göteborg': { primary: '#004CA0', secondary: '#FFFFFF' },
-  'IK Sirius': { primary: '#1E40AF', secondary: '#FFFFFF' },
-  'Kalmar FF': { primary: '#C8102E', secondary: '#000000' },
-  'Malmö FF': { primary: '#003366', secondary: '#FFFFFF' },
-  'Mjällby AIF': { primary: '#FFFFFF', secondary: '#000000' },
-  'Västerås SK': { primary: '#1E40AF', secondary: '#FFFFFF' },
-  'Örgryte IS': { primary: '#FFFFFF', secondary: '#000000' },
+  'AIK': { primary: '#000000', secondary: '#FFD700' },
+  'BK Häcken': { primary: '#FFDF00', secondary: '#000000' },
+  'Degerfors IF': { primary: '#E30613', secondary: '#FFFFFF' },
+  'Djurgårdens IF': { primary: '#002554', secondary: '#32baf2' },
+  'GAIS': { primary: '#000000', secondary: '#228B22' },
+  'Halmstads BK': { primary: '#1E40AF', secondary: '#FFFFFF' },
+  'Hammarby IF': { primary: '#217A4A', secondary: '#FFFFFF' },
+  'IF Brommapojkarna': { primary: '#FF0000', secondary: '#000000' },
+  'IF Elfsborg': { primary: '#FFDD00', secondary: '#000000' },
+  'IFK Göteborg': { primary: '#234B9A', secondary: '#FFFFFF' },
+  'IK Sirius': { primary: '#0033FF', secondary: '#000000' },
+  'Kalmar FF': { primary: '#C8102E', secondary: '#FFFFFF' },
+  'Malmö FF': { primary: '#008ECB', secondary: '#FFFFFF' },
+  'Mjällby AIF': { primary: '#FFEE00', secondary: '#000000' },
+  'Västerås SK': { primary: '#16a34a', secondary: '#FFFFFF' },
+  'Örgryte IS': { primary: '#E30613', secondary: '#1E40AF' },
 };
 
 // Färgnamn → hex för färgfläckar
 const COLOR_NAME_TO_HEX: Record<string, string> = {
-  'Ljusblå': '#004C97',
+  'Mörkblå': '#002554',
+  'Ljusblå': '#32baf2',
   'Gult': '#FFD700',
-  'Gul': '#FFC72C',
+  'Gul': '#FFDD00',
   'Svart': '#18181b',
   'Blå': '#1E40AF',
   'Vit': '#FFFFFF',

@@ -71,38 +71,39 @@ async function getClubRankings(): Promise<ClubRanking[]> {
   });
 }
 
-// Riktiga Allsvenskan-färger (brand-accurate)
+// Riktiga Allsvenskan-färger (brand-accurate, källor: colorcodeguide.com, RSSSF, idrottslaget.se, officiella profilguider)
 const CLUB_COLORS: Record<string, string> = {
-  'AIK': '#FFD700',
-  'BK Häcken': '#E30613',
-  'Degerfors IF': '#1E40AF',
-  'Djurgårdens IF': '#004C97',
-  'GAIS': '#FFC72C',
-  'Halmstads BK': '#FFFFFF',
-  'Hammarby IF': '#003DA5',
-  'IF Brommapojkarna': '#E30613',
-  'IF Elfsborg': '#FFFFFF',
-  'IFK Göteborg': '#004CA0',
-  'IK Sirius': '#1E40AF',
+  'AIK': '#000000',
+  'BK Häcken': '#FFDF00',
+  'Degerfors IF': '#E30613',
+  'Djurgårdens IF': '#002554',
+  'GAIS': '#000000',
+  'Halmstads BK': '#1E40AF',
+  'Hammarby IF': '#217A4A',
+  'IF Brommapojkarna': '#FF0000',
+  'IF Elfsborg': '#FFDD00',
+  'IFK Göteborg': '#234B9A',
+  'IK Sirius': '#0033FF',
   'Kalmar FF': '#C8102E',
-  'Malmö FF': '#003366',
-  'Mjällby AIF': '#FFFFFF',
-  'Västerås SK': '#1E40AF',
-  'Örgryte IS': '#FFFFFF',
+  'Malmö FF': '#008ECB',
+  'Mjällby AIF': '#FFEE00',
+  'Västerås SK': '#16a34a',
+  'Örgryte IS': '#E30613',
 };
 
 // Helper to extract primary colors for borders
 function getClubColors(colors: string) {
   const [c1] = colors.split('/');
   const colorMap: Record<string, string> = {
-    'Ljusblå': '#004C97',
+    'Mörkblå': '#002554',
+    'Ljusblå': '#32baf2',
     'Gult': '#FFD700',
     'Svart': '#18181b',
     'Blå': '#1E40AF',
     'Vit': '#f8fafc',
     'Rött': '#DC2626',
     'Grönt': '#16a34a',
-    'Gul': '#FFC72C',
+    'Gul': '#FFDD00',
   };
   return colorMap[c1?.trim()] || '#6b7280';
 }
