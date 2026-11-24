@@ -71,16 +71,37 @@ async function getClubRankings(): Promise<ClubRanking[]> {
   });
 }
 
+// Riktiga Allsvenskan-färger (brand-accurate)
+const CLUB_COLORS: Record<string, string> = {
+  'AIK': '#FFD700',
+  'BK Häcken': '#E30613',
+  'Degerfors IF': '#1E40AF',
+  'Djurgårdens IF': '#004C97',
+  'GAIS': '#FFC72C',
+  'Halmstads BK': '#FFFFFF',
+  'Hammarby IF': '#003DA5',
+  'IF Brommapojkarna': '#1E40AF',
+  'IF Elfsborg': '#FFFFFF',
+  'IFK Göteborg': '#004CA0',
+  'IK Sirius': '#1E40AF',
+  'Kalmar FF': '#C8102E',
+  'Malmö FF': '#003366',
+  'Mjällby AIF': '#FFFFFF',
+  'Västerås SK': '#1E40AF',
+  'Örgryte IS': '#FFFFFF',
+};
+
 // Helper to extract primary colors for borders
 function getClubColors(colors: string) {
   const [c1] = colors.split('/');
   const colorMap: Record<string, string> = {
-    'Gult': '#eab308',
+    'Gult': '#FFD700',
     'Svart': '#18181b',
-    'Blå': '#2563eb',
+    'Blå': '#1E40AF',
     'Vit': '#f8fafc',
-    'Rött': '#dc2626',
+    'Rött': '#DC2626',
     'Grönt': '#16a34a',
+    'Gul': '#FFC72C',
   };
   return colorMap[c1?.trim()] || '#6b7280';
 }
@@ -154,7 +175,7 @@ export default async function Leaderboard() {
         <div className="max-w-3xl mx-auto">
           {rankings.map((club, index) => {
             const isTop3 = index < 3;
-            const borderColor = getClubColors(club.colors);
+            const accentColor = CLUB_COLORS[club.name] || getClubColors(club.colors);
             return (
               <div
                 key={club.id}
@@ -195,7 +216,7 @@ export default async function Leaderboard() {
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-bold text-[#1a1a1a] truncate">{club.name}</h3>
                     {isTop3 && (
-                      <div className="h-1 w-4 rounded-full" style={{ backgroundColor: borderColor, opacity: 0.5 }} />
+                      <div className="h-1 w-4 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.5 }} />
                     )}
                   </div>
                   <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5">

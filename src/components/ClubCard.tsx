@@ -22,23 +22,25 @@ interface ClubCardProps {
   index?: number;
 }
 
-// Helper to extract primary/secondary colors
-function getClubColors(colors: string) {
-  const [c1, c2] = colors.split('/').map(s => s.trim());
-  const colorMap: Record<string, string> = {
-    'Gult': '#eab308',
-    'Svart': '#18181b',
-    'Gul': '#eab308',
-    'Blå': '#2563eb',
-    'Vit': '#f8fafc',
-    'Rött': '#dc2626',
-    'Grönt': '#16a34a',
-  };
-  return {
-    primary: colorMap[c1] || '#6b7280',
-    secondary: colorMap[c2] || '#9ca3af',
-  };
-}
+// Riktiga Allsvenskan-färger (brand-accurate)
+const CLUB_COLORS: Record<string, { primary: string; secondary: string }> = {
+  'AIK': { primary: '#FFD700', secondary: '#000000' },
+  'BK Häcken': { primary: '#E30613', secondary: '#FFFFFF' },
+  'Degerfors IF': { primary: '#1E40AF', secondary: '#FFFFFF' },
+  'Djurgårdens IF': { primary: '#004C97', secondary: '#00205B' },
+  'GAIS': { primary: '#FFC72C', secondary: '#000000' },
+  'Halmstads BK': { primary: '#FFFFFF', secondary: '#000000' },
+  'Hammarby IF': { primary: '#003DA5', secondary: '#FFC72C' },
+  'IF Brommapojkarna': { primary: '#1E40AF', secondary: '#FFFFFF' },
+  'IF Elfsborg': { primary: '#FFFFFF', secondary: '#000000' },
+  'IFK Göteborg': { primary: '#004CA0', secondary: '#FFFFFF' },
+  'IK Sirius': { primary: '#1E40AF', secondary: '#FFC72C' },
+  'Kalmar FF': { primary: '#C8102E', secondary: '#000000' },
+  'Malmö FF': { primary: '#003366', secondary: '#FFFFFF' },
+  'Mjällby AIF': { primary: '#FFFFFF', secondary: '#000000' },
+  'Västerås SK': { primary: '#1E40AF', secondary: '#FFFFFF' },
+  'Örgryte IS': { primary: '#FFFFFF', secondary: '#000000' },
+};
 
 export default function ClubCard({ club, crownPrice, crownHolder, index = 0 }: ClubCardProps) {
   const [showBidModal, setShowBidModal] = useState(false);
@@ -48,7 +50,7 @@ export default function ClubCard({ club, crownPrice, crownHolder, index = 0 }: C
     setMounted(true);
   }, []);
 
-  const colors = getClubColors(club.colors);
+  const colors = CLUB_COLORS[club.name] || { primary: '#6b7280', secondary: '#9ca3af' };
   const isCrowned = !!crownHolder;
 
   return (
@@ -73,7 +75,7 @@ export default function ClubCard({ club, crownPrice, crownHolder, index = 0 }: C
             </div>
           </div>
 
-          {/* Club colors top bar */}
+          {/* Club colors top bar — club-specifik färg */}
           <div className="h-1.5 rounded-t-2xl overflow-hidden" style={{
             background: `linear-gradient(90deg, ${colors.primary}, ${colors.secondary})`,
           }} />
@@ -84,7 +86,7 @@ export default function ClubCard({ club, crownPrice, crownHolder, index = 0 }: C
               <div 
                 className="w-20 h-20 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105"
                 style={{ 
-                  background: `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}10)`,
+                  background: `linear-gradient(135deg, ${colors.primary}18, ${colors.secondary}10)`,
                 }}
               >
                 {club.logo ? (
