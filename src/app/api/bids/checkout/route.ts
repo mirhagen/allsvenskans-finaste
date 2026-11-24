@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16' as Stripe.LatestApiVersion,
+  apiVersion: '2025-03-31.basil' as Stripe.LatestApiVersion,
 });
 
 export async function POST(request: Request) {
@@ -33,8 +33,7 @@ export async function POST(request: Request) {
 
   // Skapa Stripe Checkout-session
   const checkoutSession = await (stripe.checkout.sessions.create as any)({
-    payment_method_types: ['card'],
-    automatic_tax: { enabled: false },
+    automatic_tax: { enabled: true },
     line_items: [
       {
         price_data: {
