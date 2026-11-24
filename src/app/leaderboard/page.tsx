@@ -80,7 +80,7 @@ const CLUB_COLORS: Record<string, string> = {
   'GAIS': '#FFC72C',
   'Halmstads BK': '#FFFFFF',
   'Hammarby IF': '#003DA5',
-  'IF Brommapojkarna': '#1E40AF',
+  'IF Brommapojkarna': '#E30613',
   'IF Elfsborg': '#FFFFFF',
   'IFK Göteborg': '#004CA0',
   'IK Sirius': '#1E40AF',
@@ -95,6 +95,7 @@ const CLUB_COLORS: Record<string, string> = {
 function getClubColors(colors: string) {
   const [c1] = colors.split('/');
   const colorMap: Record<string, string> = {
+    'Ljusblå': '#004C97',
     'Gult': '#FFD700',
     'Svart': '#18181b',
     'Blå': '#1E40AF',

@@ -27,14 +27,14 @@ const CLUB_COLORS: Record<string, { primary: string; secondary: string }> = {
   'AIK': { primary: '#FFD700', secondary: '#000000' },
   'BK Häcken': { primary: '#E30613', secondary: '#FFFFFF' },
   'Degerfors IF': { primary: '#1E40AF', secondary: '#FFFFFF' },
-  'Djurgårdens IF': { primary: '#004C97', secondary: '#00205B' },
+  'Djurgårdens IF': { primary: '#004C97', secondary: '#FFFFFF' },
   'GAIS': { primary: '#FFC72C', secondary: '#000000' },
   'Halmstads BK': { primary: '#FFFFFF', secondary: '#000000' },
-  'Hammarby IF': { primary: '#003DA5', secondary: '#FFC72C' },
-  'IF Brommapojkarna': { primary: '#1E40AF', secondary: '#FFFFFF' },
+  'Hammarby IF': { primary: '#003DA5', secondary: '#FFFFFF' },
+  'IF Brommapojkarna': { primary: '#E30613', secondary: '#FFFFFF' },
   'IF Elfsborg': { primary: '#FFFFFF', secondary: '#000000' },
   'IFK Göteborg': { primary: '#004CA0', secondary: '#FFFFFF' },
-  'IK Sirius': { primary: '#1E40AF', secondary: '#FFC72C' },
+  'IK Sirius': { primary: '#1E40AF', secondary: '#FFFFFF' },
   'Kalmar FF': { primary: '#C8102E', secondary: '#000000' },
   'Malmö FF': { primary: '#003366', secondary: '#FFFFFF' },
   'Mjällby AIF': { primary: '#FFFFFF', secondary: '#000000' },
@@ -44,6 +44,7 @@ const CLUB_COLORS: Record<string, { primary: string; secondary: string }> = {
 
 // Färgnamn → hex för färgfläckar
 const COLOR_NAME_TO_HEX: Record<string, string> = {
+  'Ljusblå': '#004C97',
   'Gult': '#FFD700',
   'Gul': '#FFC72C',
   'Svart': '#18181b',
