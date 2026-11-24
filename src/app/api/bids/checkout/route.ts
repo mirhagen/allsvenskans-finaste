@@ -34,6 +34,7 @@ export async function POST(request: Request) {
   // Skapa Stripe Checkout-session
   const checkoutSession = await (stripe.checkout.sessions.create as any)({
     payment_method_types: ['card'],
+    automatic_tax: { enabled: false },
     line_items: [
       {
         price_data: {
