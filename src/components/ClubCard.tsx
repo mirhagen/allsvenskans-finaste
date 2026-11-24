@@ -46,6 +46,7 @@ const CLUB_COLORS: Record<string, { primary: string; secondary: string }> = {
 const COLOR_NAME_TO_HEX: Record<string, string> = {
   'Mörkblå': '#002554',
   'Ljusblå': '#32baf2',
+  'Himelsblå': '#63C6F0',
   'Gult': '#FFD700',
   'Gul': '#FFDD00',
   'Svart': '#18181b',

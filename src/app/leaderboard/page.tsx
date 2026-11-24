@@ -97,6 +97,7 @@ function getClubColors(colors: string) {
   const colorMap: Record<string, string> = {
     'Mörkblå': '#002554',
     'Ljusblå': '#32baf2',
+    'Himelsblå': '#63C6F0',
     'Gult': '#FFD700',
     'Svart': '#18181b',
     'Blå': '#1E40AF',
